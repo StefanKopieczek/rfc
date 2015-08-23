@@ -3,7 +3,7 @@ import logging
 import sys
 from zipfile import ZipFile
 
-from exceptions import CriticalError
+from rfc_exceptions import CriticalError
 
 
 def add_to_cache(rfc_num, rfc_text):
