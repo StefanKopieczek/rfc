@@ -1,5 +1,7 @@
-import argparse
+from __future__ import print_function
 import pydoc
+import sys
+import tabulate
 
 try:
     from urllib.request import urlopen
@@ -7,6 +9,15 @@ except ImportError:
     from urllib2 import urlopen
 
 import rfc_cache
+import rfc_index
+
+
+USAGE = """
+    rfc.py [view] RFC - Display the specified RFC.
+    rfc.py save   RFC - Store the specified RFC so it can be viewed offline.
+    rfc.py list       - Display all published RFCs in a table. Useful for grepping.
+    rfc.py help       - Print this message.
+"""
 
 
 def get_rfc(rfc_number, use_cache=True):
@@ -25,22 +36,28 @@ def get_rfc(rfc_number, use_cache=True):
     return rfc
 
 
-def render_rfc(rfc):
+def list_rfcs():
+    index = rfc_index.Index()
+    index.load()
+    pydoc.pager(tabulate.tabulate(index))
+
+
+def show_rfc(rfc):
     pydoc.pager(rfc)
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Download and browse RFCs, or save to read later')
-    parser.add_argument('-d', '--download', action='store_true',
-                        help='Save the RFC to read later')
-    parser.add_argument('rfc', type=int)
-    return parser.parse_args()
-
-
 if __name__ == "__main__":
-    args = parse_args()
-    if args.download:
-        rfc_cache.add_to_cache(args.rfc, get_rfc(args.rfc, use_cache=False))
+    cmd = sys.argv[1].lower()
+    if cmd == 'save':
+        rfc = get_rfc(int(sys.argv[2]), use_cache=False)
+        rfc_cache.add_to_cache(int(sys.argv[2]), rfc)
+    elif cmd == 'list':
+        list_rfcs()
+    elif cmd == 'help':
+        print(USAGE)
+    elif cmd == 'view':
+        rfc = get_rfc(int(sys.argv[2]))
+        show_rfc(rfc)
     else:
-        render_rfc(get_rfc(args.rfc))
+        rfc = get_rfc(int(sys.argv[1]))
+        show_rfc(rfc)

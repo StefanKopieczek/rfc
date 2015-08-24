@@ -24,6 +24,9 @@ class Index(object):
     def __str__(self):
         return '\n'.join(str(rfc) for rfc in self.rfcs)
 
+    def __iter__(self):
+        return iter(self.rfcs)
+
 
 class Entry(object):
     AUTHOR_TAG_NAME = Index.NAMESPACE + 'author'
@@ -38,12 +41,9 @@ class Entry(object):
         self.doc_id = int(xml.find(Entry.DOC_ID_TAG_NAME).text[3:])
         self.summary = xml.find(Entry.SUMMARY_TAG_NAME).text
 
+    def __iter__(self):
+        return iter([self.doc_id, self.summary, self.author])
+
     def __str__(self):
         return 'RFC{0} - {1}, by {2}'.format(
             self.doc_id, self.summary, self.author)
-
-
-if __name__ == "__main__":
-    index = Index()
-    index.load()
-    print(str(index))
