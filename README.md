@@ -29,7 +29,8 @@ You will now be able to call RFC from the command line in any folder, e.g. by ty
 Usage
 -----
 
-    rfc.py [view] RFC - Display the specified RFC.
-    rfc.py save   RFC - Store the specified RFC so it can be viewed offline.
-    rfc.py list       - Display all published RFCs in a table. Useful for grepping.
-    rfc.py help       - Print this message.
+    rfc [view] RFC  - Display the specified RFC.
+    rfc save   RFC  - Store the specified RFC so it can be viewed offline.
+    rfc list        - Display all published RFCs in a table. Useful for grepping.
+    rfc search TERM - Show all RFCs whose summary text contains the given term.
+    rfc help        - Print this message.

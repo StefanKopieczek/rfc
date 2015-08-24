@@ -13,10 +13,11 @@ import rfc_index
 
 
 USAGE = """
-    rfc.py [view] RFC - Display the specified RFC.
-    rfc.py save   RFC - Store the specified RFC so it can be viewed offline.
-    rfc.py list       - Display all published RFCs in a table. Useful for grepping.
-    rfc.py help       - Print this message.
+    rfc.py [view] RFC  - Display the specified RFC.
+    rfc.py save   RFC  - Store the specified RFC so it can be viewed offline.
+    rfc.py list        - Display all published RFCs in a table. Useful for grepping.
+    rfc.py search TERM - List all RFCs with the given word or phrase in the summary text.
+    rfc.py help        - Print this message.
 """
 
 
@@ -39,7 +40,14 @@ def get_rfc(rfc_number, use_cache=True):
 def list_rfcs():
     index = rfc_index.Index()
     index.load()
-    pydoc.pager(tabulate.tabulate(index))
+    pydoc.pager(tabulate.tabulate(index, tablefmt='plain'))
+
+
+def search_rfcs(term):
+    index = rfc_index.Index()
+    index.load()
+    matches = (rfc for rfc in index if term.lower() in rfc.summary.lower())
+    pydoc.pager(tabulate.tabulate(matches, tablefmt='plain'))
 
 
 def show_rfc(rfc):
@@ -53,6 +61,8 @@ def main():
         rfc_cache.store(int(sys.argv[2]), rfc)
     elif cmd == 'list':
         list_rfcs()
+    elif cmd == 'search':
+        search_rfcs(sys.argv[2])
     elif cmd == 'help':
         print(USAGE)
     elif cmd == 'view':
