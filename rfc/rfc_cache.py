@@ -6,13 +6,13 @@ from zipfile import ZipFile
 from rfc_exceptions import CriticalError
 
 
-def add_to_cache(rfc_num, rfc_text):
+def store(rfc_num, rfc_text):
     with ZipFile(get_rfc_cache(), 'a') as cache:
         cache.writestr('rfc{0}.txt'.format(rfc_num), rfc_text)
     logging.debug('Cached RFC {0} to RFC cache file'.format(rfc_num))
 
 
-def get_from_cache(rfc_num):
+def load(rfc_num):
     try:
         with ZipFile(get_rfc_cache(), 'r') as cache:
             with cache.open('rfc{0}.txt'.format(rfc_num), 'r') as rfc:

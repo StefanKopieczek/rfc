@@ -24,7 +24,7 @@ def get_rfc(rfc_number, use_cache=True):
     rfc = None
 
     if use_cache:
-        rfc = rfc_cache.get_from_cache(rfc_number)
+        rfc = rfc_cache.load(rfc_number)
 
     if rfc is None:
         url = "http://www.ietf.org/rfc/rfc{0}.txt".format(rfc_number)
@@ -46,11 +46,11 @@ def show_rfc(rfc):
     pydoc.pager(rfc)
 
 
-if __name__ == "__main__":
+def main():
     cmd = sys.argv[1].lower()
     if cmd == 'save':
         rfc = get_rfc(int(sys.argv[2]), use_cache=False)
-        rfc_cache.add_to_cache(int(sys.argv[2]), rfc)
+        rfc_cache.store(int(sys.argv[2]), rfc)
     elif cmd == 'list':
         list_rfcs()
     elif cmd == 'help':
@@ -61,3 +61,7 @@ if __name__ == "__main__":
     else:
         rfc = get_rfc(int(sys.argv[1]))
         show_rfc(rfc)
+
+
+if __name__ == '__main':
+    main()
