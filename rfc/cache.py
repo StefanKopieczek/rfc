@@ -8,7 +8,7 @@ try:
 except ImportError:
     import pickle
 
-from .rfc_exceptions import CriticalError
+from .exceptions import CriticalError
 
 
 def store_rfc(rfc_id, rfc_text):
