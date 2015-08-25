@@ -1,22 +1,12 @@
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
-
 from xml.etree import ElementTree
 
 
 class Index(object):
-    URL = 'http://www.rfc-editor.org/in-notes/rfc-index.xml'
     NAMESPACE = '{http://www.rfc-editor.org/rfc-index}'
     RFC_TAG_NAME = NAMESPACE + 'rfc-entry'
 
-    def __init__(self):
-        self.rfcs = []
-
-    def load(self):
-        index_data = urlopen(Index.URL)
-        index_tree = ElementTree.parse(index_data)
+    def __init__(self, data):
+        index_tree = ElementTree.parse(data)
         root = index_tree.getroot()
         rfc_elements = root.findall(Index.RFC_TAG_NAME)
         self.rfcs = [Entry(element) for element in rfc_elements]

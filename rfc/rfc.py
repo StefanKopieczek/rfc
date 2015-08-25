@@ -8,8 +8,8 @@ try:
 except ImportError:
     from urllib2 import urlopen
 
-import rfc_cache
-import rfc_index
+from . import rfc_cache
+from . import rfc_index
 
 
 USAGE = """
@@ -25,7 +25,7 @@ def get_rfc(rfc_number, use_cache=True):
     rfc = None
 
     if use_cache:
-        rfc = rfc_cache.load(rfc_number)
+        rfc = rfc_cache.load_rfc(rfc_number)
 
     if rfc is None:
         url = "http://www.ietf.org/rfc/rfc{0}.txt".format(rfc_number)
@@ -37,16 +37,26 @@ def get_rfc(rfc_number, use_cache=True):
     return rfc
 
 
+def get_index(use_cache=True):
+    index = None
+    if use_cache:
+        index = rfc_cache.load_index()
+
+    if index is None:
+        response = urlopen('http://www.rfc-editor.org/in-notes/rfc-index.xml')
+        index = rfc_index.Index(response)
+        rfc_cache.store_index(index)
+
+    return index
+
+
 def list_rfcs():
-    index = rfc_index.Index()
-    index.load()
-    pydoc.pager(tabulate.tabulate(index, tablefmt='plain'))
+    pydoc.pager(tabulate.tabulate(iter(get_index()), tablefmt='plain'))
 
 
 def search_rfcs(term):
-    index = rfc_index.Index()
-    index.load()
-    matches = (rfc for rfc in index if term.lower() in rfc.summary.lower())
+    index = get_index()
+    matches = (iter(rfc) for rfc in index if term.lower() in rfc.summary.lower())
     pydoc.pager(tabulate.tabulate(matches, tablefmt='plain'))
 
 
@@ -58,7 +68,7 @@ def main():
     cmd = sys.argv[1].lower()
     if cmd == 'save':
         rfc = get_rfc(int(sys.argv[2]), use_cache=False)
-        rfc_cache.store(int(sys.argv[2]), rfc)
+        rfc_cache.store_rfc(int(sys.argv[2]), rfc)
     elif cmd == 'list':
         list_rfcs()
     elif cmd == 'search':
@@ -73,5 +83,5 @@ def main():
         show_rfc(rfc)
 
 
-if __name__ == '__main':
+if __name__ == '__main__':
     main()

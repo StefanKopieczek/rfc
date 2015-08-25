@@ -3,23 +3,43 @@ import logging
 import sys
 from zipfile import ZipFile
 
-from rfc_exceptions import CriticalError
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
+from .rfc_exceptions import CriticalError
 
 
-def store(rfc_num, rfc_text):
+def store_rfc(rfc_id, rfc_text):
     with ZipFile(get_rfc_cache(), 'a') as cache:
-        cache.writestr('rfc{0}.txt'.format(rfc_num), rfc_text)
-    logging.debug('Cached RFC {0} to RFC cache file'.format(rfc_num))
+        cache.writestr('rfc{0}.txt'.format(rfc_id), rfc_text)
+    logging.debug('Cached RFC {0} to RFC cache file'.format(rfc_id))
 
 
-def load(rfc_num):
+def load_rfc(rfc_id):
     try:
         with ZipFile(get_rfc_cache(), 'r') as cache:
-            with cache.open('rfc{0}.txt'.format(rfc_num), 'r') as rfc:
+            with cache.open('rfc{0}.txt'.format(rfc_id), 'r') as rfc:
                 data = rfc.read()
                 if isinstance(data, bytes):
                     data = data.decode('utf-8')
                 return data
+    except KeyError:
+        return None
+
+
+def store_index(index):
+    with ZipFile(get_rfc_cache(), 'a') as cache:
+        cache.writestr('index.xml', pickle.dumps(index))
+    logging.debug('Cached index to index.xml')
+
+
+def load_index():
+    try:
+        with ZipFile(get_rfc_cache(), 'r') as cache:
+            with cache.open('index.xml', 'r') as index_file:
+                return pickle.load(index_file)
     except KeyError:
         return None
 
