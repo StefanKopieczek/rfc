@@ -1,5 +1,4 @@
 import os
-import logging
 import sys
 from zipfile import ZipFile
 
@@ -8,13 +7,13 @@ try:
 except ImportError:
     import pickle
 
+from . import output
 from .exceptions import CriticalError
 
 
 def store_rfc(rfc_id, rfc_text):
     with ZipFile(get_rfc_cache(), 'a') as cache:
         cache.writestr('rfc{0}.txt'.format(rfc_id), rfc_text)
-    logging.debug('Cached RFC {0} to RFC cache file'.format(rfc_id))
 
 
 def load_rfc(rfc_id):
@@ -32,7 +31,6 @@ def load_rfc(rfc_id):
 def store_index(index):
     with ZipFile(get_rfc_cache(), 'a') as cache:
         cache.writestr('index.xml', pickle.dumps(index))
-    logging.debug('Cached index to index.xml')
 
 
 def load_index():
@@ -52,8 +50,9 @@ def get_appdata_folder():
     elif sys.platform == 'darwin':
         return os.path.expanduser('~/Library/Application Support')
     else:
-        logging.warning('Unsupported platform {0}; '
-                        'RFC storage may fail'.format(sys.platform))
+        output.say('Unsupported platform {0}; '
+                   'Caching may fail'.format(sys.platform))
+
         return os.getenv('HOME')
 
 
@@ -66,8 +65,6 @@ def get_rfc_cache():
     rfc_cache_folder = os.path.join(appdata_folder, '.rfccache')
     if not os.path.exists(rfc_cache_folder):
         os.mkdir(rfc_cache_folder)
-        logging.debug('Created rfc cache folder at {0}'.format(
-            rfc_cache_folder))
     elif not os.path.isdir(rfc_cache_folder):
         raise CriticalError('Unable to create rfc cache folder {0}; '
                             'a file already exists with that name'.format(
@@ -78,6 +75,5 @@ def get_rfc_cache():
         # The RFC cache zip does not exist; create an empty zip.
         zf = ZipFile(rfc_cache, 'w')
         zf.close()
-        logging.debug('Created rfc cache at {0}'.format(rfc_cache))
 
     return rfc_cache

@@ -10,6 +10,7 @@ except ImportError:
 
 from . import cache
 from . import index
+from . import output
 
 
 USAGE = """
@@ -43,6 +44,9 @@ def get_rfc_index(use_cache=True):
         rfc_index = cache.load_index()
 
     if rfc_index is None:
+        if use_cache:
+            output.say('No cached index found. '
+                       'Downloading the RFC index; this may take a minute.')
         response = urlopen('http://www.rfc-editor.org/in-notes/rfc-index.xml')
         rfc_index = index.Index(response)
         cache.store_index(rfc_index)
@@ -65,6 +69,8 @@ def show_rfc(rfc):
 
 
 def main():
+    output.INTERACTIVE_MODE = True
+
     cmd = sys.argv[1].lower()
     if cmd == 'save':
         rfc = get_rfc(int(sys.argv[2]), use_cache=False)
