@@ -73,8 +73,12 @@ def main():
 
     cmd = sys.argv[1].lower()
     if cmd == 'save':
-        rfc = get_rfc(int(sys.argv[2]), use_cache=False)
-        cache.store_rfc(int(sys.argv[2]), rfc)
+        rfc_num = int(sys.argv[2])
+        output.say('Downloading RFC {0}...'.format(rfc_num))
+        rfc = get_rfc(rfc_num, use_cache=False)
+        output.say('Saving RFC {0}...'.format(rfc_num))
+        cache.store_rfc(rfc_num, rfc)
+        output.say('RFC saved.')
     elif cmd == 'list':
         list_rfcs()
     elif cmd == 'search':
